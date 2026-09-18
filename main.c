@@ -71,9 +71,13 @@ double waitTimeArr[MAX_PATIENTS];
 
 int registrationOrder[MAX_PATIENTS];
 
+void initializeBeds(void);
+
 int main(void)
 {
     int choice;
+
+    initializeBeds();
 
     do
     {
@@ -115,4 +119,17 @@ int main(void)
     } while (choice != 4);
 
     return 0;
+}
+
+void initializeBeds(void)
+{
+    int w, b;
+
+    for (w = 0; w < NUM_WARDS; w++)
+    {
+        for (b = 0; b < MAX_BEDS_PER_WARD; b++)
+        {
+            bedOccupancy[w][b] = 0;
+        }
+    }
 }
