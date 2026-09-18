@@ -72,12 +72,15 @@ double waitTimeArr[MAX_PATIENTS];
 int registrationOrder[MAX_PATIENTS];
 
 void initializeBeds(void);
+void loadBedStatus(void);
+void saveBedStatus(void);
 
 int main(void)
 {
     int choice;
 
     initializeBeds();
+    loadBedStatus();
 
     do
     {
@@ -110,7 +113,9 @@ int main(void)
                 printf("\n[Reports - coming soon]\n");
                 break;
             case 4:
-                printf("\nGoodbye!\n");
+                saveBedStatus();
+                printf("\nBed status saved.\n");
+                printf("Goodbye!\n");
                 break;
             default:
                 printf("\nInvalid choice. Please try again.\n");
@@ -132,4 +137,57 @@ void initializeBeds(void)
             bedOccupancy[w][b] = 0;
         }
     }
+}
+
+void loadBedStatus(void)
+{
+    FILE *fp;
+    int w, b, value;
+
+    fp = fopen("beds_status.txt", "r");
+
+    if (fp == NULL)
+    {
+        printf("\n(No previous beds_status.txt found - starting fresh)\n");
+        return;
+    }
+
+    for (w = 0; w < NUM_WARDS; w++)
+    {
+        for (b = 0; b < wardBedCapacity[w]; b++)
+        {
+            if (fscanf(fp, "%d", &value) == 1)
+            {
+                bedOccupancy[w][b] = value;
+            }
+        }
+    }
+
+    fclose(fp);
+    printf("\nBed status loaded from beds_status.txt\n");
+}
+
+void saveBedStatus(void)
+{
+    FILE *fp;
+    int w, b;
+
+    fp = fopen("beds_status.txt", "w");
+
+    if (fp == NULL)
+    {
+        printf("\nError: Could not save bed status.\n");
+        return;
+    }
+
+    for (w = 0; w < NUM_WARDS; w++)
+    {
+        for (b = 0; b < wardBedCapacity[w]; b++)
+        {
+            fprintf(fp, "%d ", bedOccupancy[w][b]);
+        }
+        fprintf(fp, "\n");
+    }
+
+    fclose(fp);
 }
