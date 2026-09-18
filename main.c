@@ -4,6 +4,8 @@
 
 #define NUM_SPECIALTIES 4
 #define NUM_WARDS 4
+#define MAX_BEDS_PER_WARD 20
+#define MAX_PATIENTS 200
 
 int specialtyID[NUM_SPECIALTIES] = {1, 2, 3, 4};
 
@@ -42,6 +44,32 @@ double wardDailyRate[NUM_WARDS] = {
 };
 
 int wardBedCapacity[NUM_WARDS] = {20, 10, 10, 5};
+
+int bedOccupancy[NUM_WARDS][MAX_BEDS_PER_WARD];
+
+int patientCount = 0;
+
+int patientNumericID[MAX_PATIENTS];
+char patientName[MAX_PATIENTS][60];
+int patientAge[MAX_PATIENTS];
+int urgencyLevel[MAX_PATIENTS];
+int specialtyIndex[MAX_PATIENTS];
+int isAdmitted[MAX_PATIENTS];
+int wardIndexArr[MAX_PATIENTS];
+int bedNumberArr[MAX_PATIENTS];
+int daysAdmitted[MAX_PATIENTS];
+
+double baseFeeArr[MAX_PATIENTS];
+double surchargeArr[MAX_PATIENTS];
+double surchargePctArr[MAX_PATIENTS];
+double wardCostArr[MAX_PATIENTS];
+double grossTotalArr[MAX_PATIENTS];
+double discountArr[MAX_PATIENTS];
+double discountPctArr[MAX_PATIENTS];
+double finalPayableArr[MAX_PATIENTS];
+double waitTimeArr[MAX_PATIENTS];
+
+int registrationOrder[MAX_PATIENTS];
 
 int main(void)
 {
