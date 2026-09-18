@@ -2,6 +2,47 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define NUM_SPECIALTIES 4
+#define NUM_WARDS 4
+
+int specialtyID[NUM_SPECIALTIES] = {1, 2, 3, 4};
+
+char specialtyName[NUM_SPECIALTIES][30] = {
+    "General Practice (OPD)",
+    "Paediatrics",
+    "Cardiology",
+    "Neurology"
+};
+
+double baseConsultFee[NUM_SPECIALTIES] = {
+    1500.00, 2500.00, 4500.00, 5000.00
+};
+
+int consultMinutes[NUM_SPECIALTIES] = {
+    15, 20, 30, 30
+};
+
+int dailyPatientCap[NUM_SPECIALTIES] = {
+    30, 20, 12, 10
+};
+
+int specialtyQueueCount[NUM_SPECIALTIES] = {0, 0, 0, 0};
+
+int wardID[NUM_WARDS] = {1, 2, 3, 4};
+
+char wardName[NUM_WARDS][40] = {
+    "General Ward",
+    "Paediatric Ward",
+    "Surgical Ward",
+    "ICU (Intensive Care Unit)"
+};
+
+double wardDailyRate[NUM_WARDS] = {
+    3000.00, 6000.00, 12000.00, 25000.00
+};
+
+int wardBedCapacity[NUM_WARDS] = {20, 10, 10, 5};
+
 int main(void)
 {
     int choice;
