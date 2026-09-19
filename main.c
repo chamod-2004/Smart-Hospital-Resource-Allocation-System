@@ -78,6 +78,7 @@ void showSpecialtyMenu(void);
 void showWardMenu(void);
 int findFreeBed(int wIdx);
 double calculateWaitTime(int specIdx);
+double calculateSurcharge(int urgency, double baseFee, double *pct);
 
 
 
@@ -242,6 +243,14 @@ double calculateWaitTime(int specIdx)
     wait = specialtyQueueCount[specIdx] * (double)consultMinutes[specIdx];
     specialtyQueueCount[specIdx]++;
     return wait;
+}
+
+double calculateSurcharge(int urgency, double baseFee, double *pct)
+{
+    if (urgency == 1) { *pct = 0.0; return 0.0; }
+    if (urgency == 2) { *pct = 0.20; return baseFee * 0.20; }
+    *pct = 0.50;
+    return baseFee * 0.50;
 }
 
 
