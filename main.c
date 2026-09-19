@@ -83,10 +83,7 @@ double calculateWardCost(int days, int wIdx);
 double calculateGrossTotal(double baseFee, double surcharge, double wardCost);
 double calculateDiscount(int age, double grossTotal, double *pct);
 double calculateFinalPayable(double gross, double discount);
-
-
-
-
+void registerPatient(void);
 
 int main(void)
 {
@@ -117,9 +114,7 @@ int main(void)
         switch (choice)
         {
             case 1:
-                showSpecialtyMenu();
-                showWardMenu();
-                printf("\n[Register Patient - coming soon]\n");
+                registerPatient();
                 break;
             case 2:
                 printf("\n[Priority List - coming soon]\n");
@@ -144,14 +139,9 @@ int main(void)
 void initializeBeds(void)
 {
     int w, b;
-
     for (w = 0; w < NUM_WARDS; w++)
-    {
         for (b = 0; b < MAX_BEDS_PER_WARD; b++)
-        {
             bedOccupancy[w][b] = 0;
-        }
-    }
 }
 
 void loadBedStatus(void)
@@ -160,7 +150,6 @@ void loadBedStatus(void)
     int w, b, value;
 
     fp = fopen("beds_status.txt", "r");
-
     if (fp == NULL)
     {
         printf("\n(No previous beds_status.txt found - starting fresh)\n");
@@ -168,15 +157,9 @@ void loadBedStatus(void)
     }
 
     for (w = 0; w < NUM_WARDS; w++)
-    {
         for (b = 0; b < wardBedCapacity[w]; b++)
-        {
             if (fscanf(fp, "%d", &value) == 1)
-            {
                 bedOccupancy[w][b] = value;
-            }
-        }
-    }
 
     fclose(fp);
     printf("\nBed status loaded from beds_status.txt\n");
@@ -188,7 +171,6 @@ void saveBedStatus(void)
     int w, b;
 
     fp = fopen("beds_status.txt", "w");
-
     if (fp == NULL)
     {
         printf("\nError: Could not save bed status.\n");
@@ -198,9 +180,7 @@ void saveBedStatus(void)
     for (w = 0; w < NUM_WARDS; w++)
     {
         for (b = 0; b < wardBedCapacity[w]; b++)
-        {
             fprintf(fp, "%d ", bedOccupancy[w][b]);
-        }
         fprintf(fp, "\n");
     }
 
@@ -212,10 +192,8 @@ void showSpecialtyMenu(void)
     int i;
     printf("\n--- SPECIALTIES ---\n");
     for (i = 0; i < NUM_SPECIALTIES; i++)
-    {
         printf(" %d. %-24s Fee: LKR %.2f  (%d mins)\n",
             specialtyID[i], specialtyName[i], baseConsultFee[i], consultMinutes[i]);
-    }
 }
 
 void showWardMenu(void)
@@ -223,10 +201,8 @@ void showWardMenu(void)
     int i;
     printf("\n--- WARDS ---\n");
     for (i = 0; i < NUM_WARDS; i++)
-    {
         printf(" %d. %-30s Rate: LKR %.2f/day  Capacity: %d\n",
             wardID[i], wardName[i], wardDailyRate[i], wardBedCapacity[i]);
-    }
 }
 
 int findFreeBed(int wIdx)
@@ -282,6 +258,115 @@ double calculateFinalPayable(double gross, double discount)
     return gross - discount;
 }
 
+void registerPatient(void)
+{
+    int i, specID, wID, bed;
 
+    if (patientCount >= MAX_PATIENTS)
+    {
+        printf("\nPatient records are full.\n");
+        return;
+    }
 
+    i = patientCount;
 
+    printf("\n--- NEW PATIENT REGISTRATION ---\n");
+
+    printf("Patient Name: ");
+    scanf(" %59[^\n]", patientName[i]);
+
+    do
+    {
+        printf("Patient Age: ");
+        scanf("%d", &patientAge[i]);
+        if (patientAge[i] < 0) printf("Age cannot be negative.\n");
+    } while (patientAge[i] < 0);
+
+    do
+    {
+        printf("Triage / Urgency Level (1=Normal, 2=Urgent, 3=Critical): ");
+        scanf("%d", &urgencyLevel[i]);
+    } while (urgencyLevel[i] < 1 || urgencyLevel[i] > 3);
+
+    showSpecialtyMenu();
+
+    do
+    {
+        printf("Select Specialty ID (1-4): ");
+        scanf("%d", &specID);
+    } while (specID < 1 || specID > 4);
+
+    specialtyIndex[i] = specID - 1;
+
+    if (specialtyQueueCount[specialtyIndex[i]] >= dailyPatientCap[specialtyIndex[i]])
+    {
+        printf("\nDaily patient cap for %s has been reached.\n", specialtyName[specialtyIndex[i]]);
+        printf("Patient cannot be registered.\n");
+        return;
+    }
+
+    do
+    {
+        printf("Is patient admitted to a ward? (1=Yes, 0=No): ");
+        scanf("%d", &isAdmitted[i]);
+    } while (isAdmitted[i] != 0 && isAdmitted[i] != 1);
+
+    if (isAdmitted[i] == 1)
+    {
+        showWardMenu();
+
+        do
+        {
+            printf("Ward ID (1-4): ");
+            scanf("%d", &wID);
+        } while (wID < 1 || wID > 4);
+
+        wardIndexArr[i] = wID - 1;
+
+        do
+        {
+            printf("Days Admitted: ");
+            scanf("%d", &daysAdmitted[i]);
+            if (daysAdmitted[i] <= 0) printf("Days admitted must be greater than 0.\n");
+        } while (daysAdmitted[i] <= 0);
+
+        bed = findFreeBed(wardIndexArr[i]);
+
+        if (bed == -1)
+        {
+            printf("\n*** Sorry, %s is FULL. ***\n", wardName[wardIndexArr[i]]);
+            printf("Patient will be registered as OPD instead.\n");
+            isAdmitted[i] = 0;
+            wardIndexArr[i] = -1;
+            bedNumberArr[i] = -1;
+            daysAdmitted[i] = 0;
+        }
+        else
+        {
+            bedNumberArr[i] = bed;
+            printf("\nBed allocated successfully.\n");
+            printf("Ward : %s\n", wardName[wardIndexArr[i]]);
+            printf("Bed  : %d\n", bedNumberArr[i]);
+        }
+    }
+    else
+    {
+        wardIndexArr[i] = -1;
+        bedNumberArr[i] = -1;
+        daysAdmitted[i] = 0;
+    }
+
+    baseFeeArr[i] = baseConsultFee[specialtyIndex[i]];
+    surchargeArr[i] = calculateSurcharge(urgencyLevel[i], baseFeeArr[i], &surchargePctArr[i]);
+    wardCostArr[i] = calculateWardCost(daysAdmitted[i], wardIndexArr[i]);
+    grossTotalArr[i] = calculateGrossTotal(baseFeeArr[i], surchargeArr[i], wardCostArr[i]);
+    discountArr[i] = calculateDiscount(patientAge[i], grossTotalArr[i], &discountPctArr[i]);
+    finalPayableArr[i] = calculateFinalPayable(grossTotalArr[i], discountArr[i]);
+    waitTimeArr[i] = calculateWaitTime(specialtyIndex[i]);
+
+    patientNumericID[i] = 1001 + i;
+    registrationOrder[i] = i;
+    patientCount++;
+
+    printf("\nPatient registered successfully! Final Payable: LKR %.2f\n", finalPayableArr[i]);
+}
