@@ -85,6 +85,8 @@ double calculateDiscount(int age, double grossTotal, double *pct);
 double calculateFinalPayable(double gross, double discount);
 void registerPatient(void);
 void printBill(int i);
+void appendPatientRecord(int i);
+
 
 
 int main(void)
@@ -371,6 +373,8 @@ void registerPatient(void)
     patientCount++;
 
     printBill(i);
+    appendPatientRecord(i);
+
 
 }
 
@@ -419,3 +423,29 @@ void printBill(int i)
     printf("====================================================\n");
 }
 
+void appendPatientRecord(int i)
+{
+    FILE *fp;
+
+    fp = fopen("patient_records.txt", "a");
+    if (fp == NULL)
+    {
+        printf("\nWarning: could not write to patient_records.txt\n");
+        return;
+    }
+
+    fprintf(fp,
+        "PAT-%d | %s | Age:%d | Urgency:%d | Specialty:%s | Ward:%s | Bed:%d | Days:%d | Final:LKR %.2f\n",
+        patientNumericID[i],
+        patientName[i],
+        patientAge[i],
+        urgencyLevel[i],
+        specialtyName[specialtyIndex[i]],
+        (isAdmitted[i] == 1 ? wardName[wardIndexArr[i]] : "OPD (Not Admitted)"),
+        bedNumberArr[i],
+        daysAdmitted[i],
+        finalPayableArr[i]
+    );
+
+    fclose(fp);
+}

@@ -1,0 +1,1 @@
+PAT-1001 | chamod | Age:21 | Urgency:2 | Specialty:Cardiology | Ward:Surgical Ward | Bed:1 | Days:23 | Final:LKR 281400.00
