@@ -84,6 +84,8 @@ double calculateGrossTotal(double baseFee, double surcharge, double wardCost);
 double calculateDiscount(int age, double grossTotal, double *pct);
 double calculateFinalPayable(double gross, double discount);
 void registerPatient(void);
+void printBill(int i);
+
 
 int main(void)
 {
@@ -368,5 +370,52 @@ void registerPatient(void)
     registrationOrder[i] = i;
     patientCount++;
 
-    printf("\nPatient registered successfully! Final Payable: LKR %.2f\n", finalPayableArr[i]);
+    printBill(i);
+
 }
+
+void printBill(int i)
+{
+    char subsidyNote[40] = "";
+    char urgencyText[15];
+
+    if (patientAge[i] < 5 || patientAge[i] > 65)
+        strcpy(subsidyNote, "(15% Subsidy Eligible)");
+
+    if (urgencyLevel[i] == 1) strcpy(urgencyText, "Normal");
+    else if (urgencyLevel[i] == 2) strcpy(urgencyText, "Urgent");
+    else strcpy(urgencyText, "Critical");
+
+    printf("\n");
+    printf("====================================================\n");
+    printf("          SMART HOSPITAL ADMISSION & BILL\n");
+    printf("====================================================\n");
+    printf("Patient ID     : PAT-%d\n", patientNumericID[i]);
+    printf("Patient Name   : %s\n", patientName[i]);
+    printf("Age            : %d Years %s\n", patientAge[i], subsidyNote);
+    printf("Specialty      : %s\n", specialtyName[specialtyIndex[i]]);
+
+    if (isAdmitted[i] == 1 && bedNumberArr[i] != -1)
+        printf("Assigned Ward  : %s (Bed #%02d)\n", wardName[wardIndexArr[i]], bedNumberArr[i]);
+    else
+        printf("Assigned Ward  : Outpatient (OPD)\n");
+
+    printf("Urgency Level  : Level %d (%s)\n", urgencyLevel[i], urgencyText);
+    printf("----------------------------------------------------\n");
+    printf("Base Consultation Fee   : LKR %.2f\n", baseFeeArr[i]);
+    printf("Emergency Surcharge     : LKR %.2f (%.0f%%)\n", surchargeArr[i], surchargePctArr[i] * 100);
+    printf("Ward Stay Cost (%d Days) : LKR %.2f\n", daysAdmitted[i], wardCostArr[i]);
+    printf("----------------------------------------------------\n");
+    printf("Gross Total Bill        : LKR %.2f\n", grossTotalArr[i]);
+    printf("Age Subsidy Discount    : LKR -%.2f (%.0f%%)\n", discountArr[i], discountPctArr[i] * 100);
+    printf("----------------------------------------------------\n");
+    printf("Final Payable Amount    : LKR %.2f\n", finalPayableArr[i]);
+
+    if (waitTimeArr[i] <= 0.0)
+        printf("Estimated Waiting Time  : 0.00 mins (Immediate Attention)\n");
+    else
+        printf("Estimated Waiting Time  : %.2f mins\n", waitTimeArr[i]);
+
+    printf("====================================================\n");
+}
+
