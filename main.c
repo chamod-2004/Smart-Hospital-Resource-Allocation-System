@@ -74,6 +74,8 @@ int registrationOrder[MAX_PATIENTS];
 void initializeBeds(void);
 void loadBedStatus(void);
 void saveBedStatus(void);
+void showSpecialtyMenu(void);
+void showWardMenu(void);
 
 int main(void)
 {
@@ -104,6 +106,8 @@ int main(void)
         switch (choice)
         {
             case 1:
+                showSpecialtyMenu();
+                showWardMenu();
                 printf("\n[Register Patient - coming soon]\n");
                 break;
             case 2:
@@ -190,4 +194,26 @@ void saveBedStatus(void)
     }
 
     fclose(fp);
+}
+
+void showSpecialtyMenu(void)
+{
+    int i;
+    printf("\n--- SPECIALTIES ---\n");
+    for (i = 0; i < NUM_SPECIALTIES; i++)
+    {
+        printf(" %d. %-24s Fee: LKR %.2f  (%d mins)\n",
+            specialtyID[i], specialtyName[i], baseConsultFee[i], consultMinutes[i]);
+    }
+}
+
+void showWardMenu(void)
+{
+    int i;
+    printf("\n--- WARDS ---\n");
+    for (i = 0; i < NUM_WARDS; i++)
+    {
+        printf(" %d. %-30s Rate: LKR %.2f/day  Capacity: %d\n",
+            wardID[i], wardName[i], wardDailyRate[i], wardBedCapacity[i]);
+    }
 }
