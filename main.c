@@ -79,6 +79,9 @@ void showWardMenu(void);
 int findFreeBed(int wIdx);
 double calculateWaitTime(int specIdx);
 double calculateSurcharge(int urgency, double baseFee, double *pct);
+double calculateWardCost(int days, int wIdx);
+double calculateGrossTotal(double baseFee, double surcharge, double wardCost);
+
 
 
 
@@ -252,5 +255,17 @@ double calculateSurcharge(int urgency, double baseFee, double *pct)
     *pct = 0.50;
     return baseFee * 0.50;
 }
+
+double calculateWardCost(int days, int wIdx)
+{
+    if (days <= 0 || wIdx < 0) return 0.0;
+    return days * wardDailyRate[wIdx];
+}
+
+double calculateGrossTotal(double baseFee, double surcharge, double wardCost)
+{
+    return baseFee + surcharge + wardCost;
+}
+
 
 
