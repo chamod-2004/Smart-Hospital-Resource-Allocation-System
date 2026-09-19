@@ -81,6 +81,9 @@ double calculateWaitTime(int specIdx);
 double calculateSurcharge(int urgency, double baseFee, double *pct);
 double calculateWardCost(int days, int wIdx);
 double calculateGrossTotal(double baseFee, double surcharge, double wardCost);
+double calculateDiscount(int age, double grossTotal, double *pct);
+double calculateFinalPayable(double gross, double discount);
+
 
 
 
@@ -266,6 +269,19 @@ double calculateGrossTotal(double baseFee, double surcharge, double wardCost)
 {
     return baseFee + surcharge + wardCost;
 }
+
+double calculateDiscount(int age, double grossTotal, double *pct)
+{
+    if (age < 5 || age > 65) { *pct = 0.15; return grossTotal * 0.15; }
+    *pct = 0.0;
+    return 0.0;
+}
+
+double calculateFinalPayable(double gross, double discount)
+{
+    return gross - discount;
+}
+
 
 
 
