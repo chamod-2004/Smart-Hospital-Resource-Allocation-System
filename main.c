@@ -77,6 +77,8 @@ void saveBedStatus(void);
 void showSpecialtyMenu(void);
 void showWardMenu(void);
 int findFreeBed(int wIdx);
+double calculateWaitTime(int specIdx);
+
 
 
 int main(void)
@@ -233,4 +235,13 @@ int findFreeBed(int wIdx)
     }
     return -1;
 }
+
+double calculateWaitTime(int specIdx)
+{
+    double wait;
+    wait = specialtyQueueCount[specIdx] * (double)consultMinutes[specIdx];
+    specialtyQueueCount[specIdx]++;
+    return wait;
+}
+
 
