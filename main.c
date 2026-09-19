@@ -76,6 +76,8 @@ void loadBedStatus(void);
 void saveBedStatus(void);
 void showSpecialtyMenu(void);
 void showWardMenu(void);
+int findFreeBed(int wIdx);
+
 
 int main(void)
 {
@@ -217,3 +219,18 @@ void showWardMenu(void)
             wardID[i], wardName[i], wardDailyRate[i], wardBedCapacity[i]);
     }
 }
+
+int findFreeBed(int wIdx)
+{
+    int b;
+    for (b = 0; b < wardBedCapacity[wIdx]; b++)
+    {
+        if (bedOccupancy[wIdx][b] == 0)
+        {
+            bedOccupancy[wIdx][b] = 1;
+            return b + 1;
+        }
+    }
+    return -1;
+}
+
