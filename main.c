@@ -86,6 +86,9 @@ double calculateFinalPayable(double gross, double discount);
 void registerPatient(void);
 void printBill(int i);
 void appendPatientRecord(int i);
+void sortAndDisplayByPriority(void);
+void generateReports(void);
+
 
 
 
@@ -121,10 +124,10 @@ int main(void)
                 registerPatient();
                 break;
             case 2:
-                printf("\n[Priority List - coming soon]\n");
+                sortAndDisplayByPriority();
                 break;
             case 3:
-                printf("\n[Reports - coming soon]\n");
+                generateReports();
                 break;
             case 4:
                 saveBedStatus();
@@ -448,4 +451,126 @@ void appendPatientRecord(int i)
     );
 
     fclose(fp);
+}
+
+void sortAndDisplayByPriority(void)
+{
+    int idx[MAX_PATIENTS];
+    int i, j, best, temp;
+
+    if (patientCount == 0)
+    {
+        printf("\nNo patients registered yet.\n");
+        return;
+    }
+
+    for (i = 0; i < patientCount; i++)
+        idx[i] = i;
+
+    for (i = 0; i < patientCount - 1; i++)
+    {
+        best = i;
+        for (j = i + 1; j < patientCount; j++)
+        {
+            int a = idx[j];
+            int b = idx[best];
+
+            if (urgencyLevel[a] > urgencyLevel[b])
+                best = j;
+            else if (urgencyLevel[a] == urgencyLevel[b] && registrationOrder[a] < registrationOrder[b])
+                best = j;
+        }
+
+        if (best != i)
+        {
+            temp = idx[i];
+            idx[i] = idx[best];
+            idx[best] = temp;
+        }
+    }
+
+    printf("\n=== PATIENTS IN PRIORITY ORDER ===\n");
+    printf("Critical -> Urgent -> Normal\n");
+    printf("--------------------------------------------------------------------------\n");
+    printf("%-10s %-20s %-8s %-10s %-15s %-15s\n", "ID", "Name", "Age", "Urgency", "Specialty", "Final (LKR)");
+    printf("--------------------------------------------------------------------------\n");
+
+    for (i = 0; i < patientCount; i++)
+    {
+        int p = idx[i];
+        const char *u;
+
+        if (urgencyLevel[p] == 3) u = "Critical";
+        else if (urgencyLevel[p] == 2) u = "Urgent";
+        else u = "Normal";
+
+        printf("PAT-%-6d %-20s %-8d %-10s %-15s %.2f\n",
+            patientNumericID[p], patientName[p], patientAge[p], u,
+            specialtyName[specialtyIndex[p]], finalPayableArr[p]);
+    }
+}
+
+void generateReports(void)
+{
+    int i, w, b;
+    int countLevel[4] = {0, 0, 0, 0};
+    double totalRevenue = 0.0;
+    double totalDiscount = 0.0;
+    int topPatient = -1;
+    double topAmount = -1.0;
+
+    if (patientCount == 0)
+    {
+        printf("\nNo patients registered yet - nothing to report.\n");
+        return;
+    }
+
+    for (i = 0; i < patientCount; i++)
+    {
+        countLevel[urgencyLevel[i]]++;
+        totalRevenue += finalPayableArr[i];
+        totalDiscount += discountArr[i];
+
+        if (finalPayableArr[i] > topAmount)
+        {
+            topAmount = finalPayableArr[i];
+            topPatient = i;
+        }
+    }
+
+    printf("\n============== SUMMARY REPORT ==============\n");
+    printf("Total Patients Registered : %d\n", patientCount);
+    printf("  - Level 1 (Normal)   : %d\n", countLevel[1]);
+    printf("  - Level 2 (Urgent)   : %d\n", countLevel[2]);
+    printf("  - Level 3 (Critical) : %d\n", countLevel[3]);
+    printf("----------------------------------------------\n");
+    printf("Total Revenue Earned  : LKR %.2f\n", totalRevenue);
+    printf("Total Discounts Given : LKR %.2f\n", totalDiscount);
+    printf("----------------------------------------------\n");
+    printf("Bed Occupancy By Ward:\n");
+
+    for (w = 0; w < NUM_WARDS; w++)
+    {
+        int occupied = 0;
+        double percentage;
+
+        for (b = 0; b < wardBedCapacity[w]; b++)
+            if (bedOccupancy[w][b] == 1)
+                occupied++;
+
+        if (wardBedCapacity[w] > 0)
+            percentage = (100.0 * occupied / wardBedCapacity[w]);
+        else
+            percentage = 0.0;
+
+        printf("  - %-30s : %d/%d beds (%.1f%%)\n", wardName[w], occupied, wardBedCapacity[w], percentage);
+    }
+
+    printf("----------------------------------------------\n");
+
+    if (topPatient != -1)
+        printf("Highest-Paying Patient : %s (PAT-%d) - LKR %.2f\n",
+            patientName[topPatient], patientNumericID[topPatient], topAmount);
+
+    printf("================================================\n");
 }
